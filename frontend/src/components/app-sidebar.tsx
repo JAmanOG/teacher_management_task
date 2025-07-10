@@ -266,6 +266,18 @@ export function AppSidebar({ activeTab, onTabChange }: SidebarProps) {
       permission: "view_teachers",
     },
     {
+      id: "classes",
+      label: "Classes",
+      icon: Users,
+      permission: "manage_system",
+    },
+    {
+      id: "chapters",
+      label: "Chapters",
+      icon: BookOpen,
+      permission: "edit_lessons",
+    },  
+    {
       id: "lessons",
       label: "Lesson Tracker",
       icon: BookOpen,
@@ -336,17 +348,17 @@ export function AppSidebar({ activeTab, onTabChange }: SidebarProps) {
 
   return (
     <Sidebar variant="sidebar" collapsible="icon">
-      <SidebarContent>
+      <SidebarContent className="bg-[#0c2630] text-[#f2fbfa]">
         {/* Header */}
         <SidebarGroup>
           <SidebarGroupLabel className="px-0">
             <div className="flex items-center gap-2 px-2 py-1">
               <div className="flex items-center justify-center w-8 h-8 bg-primary/10 rounded-lg">
-                <GraduationCap className="h-5 w-5 text-primary" />
+                <GraduationCap className="h-5 w-5 text-white" />
               </div>
               <div className="group-data-[collapsible=icon]:hidden">
-                <h2 className="font-semibold text-sm">EduManage</h2>
-                <p className="text-xs text-muted-foreground">
+                <h2 className="font-semibold text-sm text-white">EduManage</h2>
+                <p className="text-xs text-muted-foreground ">
                   School Management
                 </p>
               </div>
@@ -359,7 +371,8 @@ export function AppSidebar({ activeTab, onTabChange }: SidebarProps) {
           <SidebarGroup>
             <SidebarGroupContent>
               <div className="flex items-center gap-2 px-2 py-3 border-b border-border/50">
-                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-medium text-sm">
+                {/* <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-medium text-sm"> */}
+                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-white border-[1px] font-medium text-sm">
                   {getInitials(user.name)}
                 </div>
                 <div className="group-data-[collapsible=icon]:hidden flex-1 min-w-0">
@@ -388,7 +401,7 @@ export function AppSidebar({ activeTab, onTabChange }: SidebarProps) {
                       className={cn(
                         "w-full h-10",
                         isActive &&
-                          "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
+                          "border-l-2 border-[#cebc84] shadow-sm shadow-amber-500 text-primary-foreground hover:bg-primary hover:text-primary-foreground"
                       )}
                       onClick={() => {
                         onTabChange(item.id);
@@ -411,7 +424,7 @@ export function AppSidebar({ activeTab, onTabChange }: SidebarProps) {
       </SidebarContent>
 
       {/* Footer */}
-      <SidebarFooter>
+      <SidebarFooter className="bg-[#0c2630] text-[#f2fbfa]">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton

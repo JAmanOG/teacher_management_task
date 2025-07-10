@@ -39,13 +39,9 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <SidebarProvider>
-
               <div className="flex min-h-screen w-screen">
-                {/* The sidebar will be rendered by the main page component */}
-            <SidebarTrigger />
-                <main className="flex-1">
-                  {children}
-                </main>
+                <SidebarTrigger />
+                <main className="flex-1">{children}</main>
               </div>
             </SidebarProvider>
           </ThemeProvider>
