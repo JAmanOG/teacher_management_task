@@ -6,7 +6,7 @@ const app = express();
 // const { DATABASE_URL } = process.env;
 
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: 'https://teacher-management-task.vercel.app',
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization']
     }));

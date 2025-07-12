@@ -25,6 +25,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, GraduationCap } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import Link from "next/link";
+import { baseUrl } from "../../../constant";
 
 const ROLES = ["Teacher", "Head Teacher", "Admin", "Principal"];
 const SUBJECTS = [
@@ -103,12 +104,7 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-
-        const baseUrl = process.env.NODE_ENV === 'development' 
-        ? 'http://localhost:5000' // Adjust port to match your backend
-        : '';
-
-      const response = await fetch(`${baseUrl}/api/v1/auth/register`, {
+      const response = await fetch(`${baseUrl}/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

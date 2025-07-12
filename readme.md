@@ -119,7 +119,7 @@ pnpm install
 3. **Environment Configuration**
 Create a `.env.local` file in the root directory:
 ```env
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8000/api
+NEXT_PUBLIC_API_BASE_URL=teacher-management-gydfaaesaaebe8hr.centralindia-01.azurewebsites.net/api/v1
 NEXT_PUBLIC_APP_NAME=Teacher Management System
 ```
 

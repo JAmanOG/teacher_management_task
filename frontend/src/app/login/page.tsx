@@ -19,32 +19,32 @@ import { Eye, EyeOff, GraduationCap } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { baseUrl } from "../../../constant";
 
-const DEMO_USERS = [
-  {
-    email: "admin@school.edu",
-    password: "admin123",
-    role: "Admin",
-    name: "Emily Rodriguez",
-  },
-  {
-    email: "principal@school.edu",
-    password: "principal123",
-    role: "Principal",
-    name: "David Thompson",
-  },
-  {
-    email: "teacher@school.edu",
-    password: "teacher123",
-    role: "Teacher",
-    name: "Sarah Johnson",
-  },
-  {
-    email: "head@school.edu",
-    password: "head123",
-    role: "Head Teacher",
-    name: "Michael Chen",
-  },
-];
+// const DEMO_USERS = [
+//   {
+//     email: "admin@school.edu",
+//     password: "admin123",
+//     role: "Admin",
+//     name: "Emily Rodriguez",
+//   },
+//   {
+//     email: "principal@school.edu",
+//     password: "principal123",
+//     role: "Principal",
+//     name: "David Thompson",
+//   },
+//   {
+//     email: "teacher@school.edu",
+//     password: "teacher123",
+//     role: "Teacher",
+//     name: "Sarah Johnson",
+//   },
+//   {
+//     email: "head@school.edu",
+//     password: "head123",
+//     role: "Head Teacher",
+//     name: "Michael Chen",
+//   },
+// ];
 
 // interface User {
 //   email: string;
