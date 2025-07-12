@@ -365,6 +365,8 @@ export function ChapterDetailsModal({
         totalLessons: chapter.totalLessons + 1,
       };
       onUpdateChapter(updatedChapter);
+      setLocalChapter(updatedChapter);
+
     } catch (error) {
       console.error("Failed to add lesson:", error);
       toast({

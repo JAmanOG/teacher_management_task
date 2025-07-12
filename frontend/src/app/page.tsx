@@ -1186,8 +1186,10 @@ export default function TeacherManagement() {
     );
   };
 
-  const handleAddLesson = (lesson: Lesson) => {
-    setLessons((prev) => [...prev, lesson]);
+  const handleAddLesson = (lesson: Omit<Lesson, "temp_id">) => {
+    setLessons((prev) => [...prev, { ...lesson, temp_id: Date.now().toString() }]);
+    // Reload the page after adding the lesson
+    window.location.reload();
   };
 
   const handleDeleteLesson = (lessonId: string) => {
