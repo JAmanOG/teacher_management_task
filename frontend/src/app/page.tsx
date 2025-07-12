@@ -61,6 +61,8 @@ import { ClassManagement } from "../components/class-management";
 import { ChapterCreation } from "../components/chapter-creation";
 import { StudentCreation } from "@/components/student-creation";
 import { baseUrl } from "../../constant";
+import { useRouter } from "next/navigation";
+
 // import type { Teacher } from "../types/teacher" // Import Teacher type
 export interface Teacher {
   id: string;
@@ -655,11 +657,16 @@ export default function TeacherManagement() {
   const [deletingTeacher, setDeletingTeacher] = useState<Teacher | null>(null);
   const [viewingTeacher, setViewingTeacher] = useState<Teacher | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
+  const router = useRouter();
   const { toast } = useToast();
   const { theme, setTheme } = useTheme();
 
   const currentUser:Teacher | null = user as Teacher | null
+
+  if (!user) {
+    router.push("/login");
+    return null;
+  }
 
   useEffect(() => {
     const fetchData = async () => {
