@@ -28,11 +28,28 @@ import { useSidebar } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 
+type TabType =
+  | "dashboard"
+  | "teachers"
+  | "lessons"
+  | "schedule"
+  | "students"
+  | "classes"
+  | "chapters"
+  | "checkin"
+  | "comments"
+  | "reports"
+  | "roles"
+  | "notifications"
+  | "settings"
+  | "student-creation";
+
 interface SidebarProps {
   activeTab: string;
-  onTabChange: (tab: string) => void;
+  onTabChange: (tab: TabType) => void;
 }
-export function AppSidebar({ activeTab, onTabChange }: SidebarProps) {
+
+const AppSidebar = React.memo(({ activeTab, onTabChange }: SidebarProps) => {
   const {
     setOpenMobile,
     isMobile,
@@ -202,7 +219,7 @@ export function AppSidebar({ activeTab, onTabChange }: SidebarProps) {
                           "border-l-2 border-[#cebc84] shadow-sm shadow-amber-500 text-primary-foreground hover:bg-primary hover:text-primary-foreground"
                       )}
                       onClick={() => {
-                        onTabChange(item.id);
+                        onTabChange(item.id as TabType);
                         if (isMobile) {
                           setOpenMobile(false);
                         }
@@ -240,4 +257,6 @@ export function AppSidebar({ activeTab, onTabChange }: SidebarProps) {
       </SidebarFooter>
     </Sidebar>
   );
-}
+})
+AppSidebar.displayName = 'AppSidebar'
+export {AppSidebar}

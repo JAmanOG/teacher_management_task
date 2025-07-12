@@ -62,7 +62,6 @@ import { ChapterCreation } from "../components/chapter-creation";
 import { StudentCreation } from "@/components/student-creation";
 import { baseUrl } from "../../constant";
 // import type { Teacher } from "../types/teacher" // Import Teacher type
-
 export interface Teacher {
   id: string;
   fullName: string;
@@ -164,6 +163,7 @@ export interface CheckInRecord {
   location: string;
   status: "Present" | "Absent" | "Late";
 }
+
 
 export interface Comment {
   id: string;
@@ -752,6 +752,7 @@ export default function TeacherManagement() {
             toast({
               title: "Success",
               description: `${result.value} data loaded successfully!`,
+              variant: "default",
             });
           } else {
             console.error(`Error fetching data: ${result.reason}`);
@@ -762,7 +763,7 @@ export default function TeacherManagement() {
         console.error("Error fetching data:", error);
         toast({
           title: "Error",
-          description: `Failed to load some data.${(error as any)?.message ?? ""}  Please refresh the page.`,
+          description: `Failed to load some data.${(error as Error)?.message ?? ""}  Please refresh the page.`,
           variant: "destructive",
         });
       } finally {
@@ -773,7 +774,7 @@ export default function TeacherManagement() {
     if (user) {
       fetchData();
     }
-  }, [user, accesstoken, refreshAccessToken, toast]);
+  }, [user, accesstoken,refreshAccessToken, toast]);
 
   // useEffect(() => {
   //   const fetchStudents = async () => {
@@ -937,7 +938,7 @@ export default function TeacherManagement() {
     } catch (error) {
       toast({
         title: "Error",
-        description: `Failed to add teacher.${error} Please try again.`,
+        description: `Failed to add teacher.${(error instanceof Error ? error.message : String(error))}Please try again.`,
         variant: "destructive",
       });
     } finally {
@@ -999,7 +1000,7 @@ export default function TeacherManagement() {
     } catch (error) {
       toast({
         title: "Error",
-        description: `Failed to update teacher.${(error as any)?.message ?? ""} Please try again.`,
+        description: `Failed to update teacher.${(error instanceof Error ? error.message : String(error))} Please try again.`,
         variant: "destructive",
       });
     } finally {
@@ -1030,7 +1031,7 @@ export default function TeacherManagement() {
     } catch (error) {
       toast({
         title: "Error",
-        description: `Failed to delete teacher.${(error as any)?.message ?? ""}  Please try again.`,
+        description: `Failed to delete teacher.${(error instanceof Error ? error.message : String(error))}  Please try again.`,
         variant: "destructive",
       });
     } finally {
@@ -1068,7 +1069,7 @@ export default function TeacherManagement() {
     } catch (error) {
       toast({
         title: "Error",
-        description: `Failed to update teacher status.${(error as any)?.message ?? ""} Please try again.`,
+        description: `Failed to update teacher status.${(error instanceof Error ? error.message : String(error))} Please try again.`,
         variant: "destructive",
       });
     } finally {
@@ -1109,11 +1110,10 @@ export default function TeacherManagement() {
         title: "Success",
         description: `${result.deletedCount} teachers deleted successfully!`,
       });
-    } catch (error: any) {
-      const errorMessage = error?.message || '';
+    } catch (error) {
       toast({
         title: "Error",
-        description: `Failed to delete teachers. ${errorMessage} Please try again.`,
+        description: `Failed to delete teachers.${(error instanceof Error ? error.message : String(error))}Please try again.`,
         variant: "destructive",
       });
     } finally {
@@ -1317,6 +1317,7 @@ export default function TeacherManagement() {
       toast({
         title: "Success",
         description: "Chapter duplicated successfully!",
+        variant: "success",
       });
     }
   };
@@ -1325,7 +1326,7 @@ export default function TeacherManagement() {
     <div className="min-h-screen bg-background flex">
       <AppSidebar 
         activeTab={activeTab} 
-        onTabChange={(tab: string) => setActiveTab(tab as any)} 
+        onTabChange={(tab: typeof activeTab) => setActiveTab(tab)} 
       />
 
       {/* Good morning Greeting and date and time */}

@@ -45,7 +45,7 @@ import {
 } from "lucide-react";
 import type { Chapter, Teacher, Class } from "@/app/page";
 import { useAuth } from "@/hooks/use-auth";
-import { toast } from "./ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { baseUrl } from "../../constant";
 
 interface ChapterCreationProps {

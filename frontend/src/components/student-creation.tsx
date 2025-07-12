@@ -23,9 +23,22 @@ interface StudentCreationProps {
   canEdit: boolean
 }
 
+type CsvStudentRow = {
+  studentid: string;
+  fullname: string;
+  email: string;
+  classid: string;
+  overallgrade?: string;
+  attendancerate?: string;
+  parentname?: string;
+  parentphone?: string;
+  parentemail?: string;
+};
+
+
 export function StudentCreation({ students, classes, onAddStudent, onBulkAddStudents, canEdit }: StudentCreationProps) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const [csvData, setCsvData] = useState<any[]>([])
+  const [csvData, setCsvData] = useState<CsvStudentRow[]>([])
   const [csvErrors, setCsvErrors] = useState<string[]>([])
   const [isProcessing, setIsProcessing] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -161,7 +174,7 @@ export function StudentCreation({ students, classes, onAddStudent, onBulkAddStud
       return
     }
 
-    const data: any[] = []
+    const data: CsvStudentRow[] = []
     const errors: string[] = []
 
     for (let i = 1; i < lines.length; i++) {
@@ -171,10 +184,11 @@ export function StudentCreation({ students, classes, onAddStudent, onBulkAddStud
         continue
       }
 
-      const row: any = {}
+      const tempRow: { [key: string]: string } = {};
       headers.forEach((header, index) => {
-        row[header] = values[index]
-      })
+        tempRow[header] = values[index];
+      });
+      const row: CsvStudentRow = tempRow as CsvStudentRow;
 
       // Validate required fields
       if (!row.studentid || !row.fullname || !row.email || !row.classid) {
@@ -211,7 +225,7 @@ export function StudentCreation({ students, classes, onAddStudent, onBulkAddStud
       email: row.email,
       classId: row.classid,
       overallGrade: row.overallgrade || "B",
-      attendanceRate: Number.parseInt(row.attendancerate) || 85,
+      attendanceRate: Number.parseInt(row.attendancerate ?? "") || 85,
       subjects: [],
       parentContact: {
         name: row.parentname || "",

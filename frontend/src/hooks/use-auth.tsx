@@ -1,6 +1,7 @@
+// eslint-disable-next-line react-hooks/exhaustive-deps
 "use client"
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import { createContext, useContext, useState, useEffect, type ReactNode, useCallback, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { parseCookies } from 'nookies'
 import { baseUrl } from "../../constant"
@@ -12,10 +13,14 @@ interface User {
   role: "Teacher" | "Head Teacher" | "Admin" | "Principal"
   permissions?: string[]
 }
+interface LoginUserData {
+  user: User
+  accessToken: string
+}
 
 interface AuthContextType {
     user: User | null
-    login: (userData: any) => void
+    login: (userData: LoginUserData) => void
     logout: () => void
     isLoading: boolean
     accesstoken: string | null
@@ -93,56 +98,18 @@ interface AuthContextType {
     const [isLoading, setIsLoading] = useState(true)
     const [accesstoken, setAccessToken] = useState<string | null>(null)
     const router = useRouter()
-  
+    console.log("here ")
 
-    useEffect(() => {
-      const initializeAuth = async () => {
-        try {
-          // Check for stored user and token on mount
-          const storedUser = typeof window !== 'undefined' ? localStorage.getItem("user") : null
-          const storedToken = typeof window !== 'undefined' ? localStorage.getItem("accessToken") : null
-          
-          if (storedUser && storedToken) {
-            const userData:User = JSON.parse(storedUser)
-            
-            // Add null check before accessing role
-            if (userData && userData.role && ROLE_PERMISSIONS[userData.role]) {
-              setUser({
-                ...userData,
-                permissions: ROLE_PERMISSIONS[userData.role]
-              })
-              setAccessToken(storedToken)
-            } else {
-              // Handle invalid user data
-              console.warn("Invalid user data in localStorage")
-              localStorage.removeItem("user")
-              localStorage.removeItem("accessToken")
-            }
-          } else {
-            // No stored auth data, try to get a new access token with refresh token
-            const newToken = await refreshAccessToken()
-            if (!newToken) {
-              // No valid session, redirect to login
-              console.log("No valid session found")
-              // logout()
-            }
-          }
-        } catch (error) {
-          console.error("Error initializing auth:", error)
-          localStorage.removeItem("user")
-          localStorage.removeItem("accessToken")
-        } finally {
-          setIsLoading(false)
-        }
-      }
-      
-      initializeAuth()
-    }, [])
+    const logout = () => {
+      setUser(null)
+      localStorage.removeItem("user")
+      router.push("/login")
+    }
+    const initializationRef = useRef(false)
 
 
-
-
-    const refreshAccessToken = async (): Promise<string | null> => {
+// eslint-disable-next-line react-hooks/exhaustive-deps
+    const refreshAccessToken = useCallback(async (): Promise<string | null> => {
       try {
         // Get refresh token from cookies
         const cookies = parseCookies()
@@ -185,10 +152,57 @@ interface AuthContextType {
         logout()
         return null
       }
-    }
-  
-  
-    const login = (userData: any) => {
+    }, [user,logout])
+
+    useEffect(() => {
+      if (initializationRef.current) return
+      
+      const initializeAuth = async () => {
+        try {
+          initializationRef.current = true
+          
+          // Check for stored user and token on mount
+          const storedUser = typeof window !== 'undefined' ? localStorage.getItem("user") : null
+          const storedToken = typeof window !== 'undefined' ? localStorage.getItem("accessToken") : null
+          
+          if (storedUser && storedToken) {
+            const userData:User = JSON.parse(storedUser)
+            
+            // Add null check before accessing role
+            if (userData && userData.role && ROLE_PERMISSIONS[userData.role]) {
+              setUser({
+                ...userData,
+                permissions: ROLE_PERMISSIONS[userData.role]
+              })
+              setAccessToken(storedToken)
+            } else {
+              // Handle invalid user data
+              console.warn("Invalid user data in localStorage")
+              localStorage.removeItem("user")
+              localStorage.removeItem("accessToken")
+            }
+          } else {
+            // No stored auth data, try to get a new access token with refresh token
+            const newToken = await refreshAccessToken()
+            if (!newToken) {
+              // No valid session, redirect to login
+              console.log("No valid session found")
+            }
+          }
+        } catch (error) {
+          console.error("Error initializing auth:", error)
+          localStorage.removeItem("user")
+          localStorage.removeItem("accessToken")
+        } finally {
+          setIsLoading(false)
+        }
+      }
+      
+      initializeAuth()
+    }, [refreshAccessToken])
+      
+
+    const login = (userData: LoginUserData) => {
       // Add validation before setting user
       const newUserData: User = userData.user
       console.log("Login data received:", userData)
@@ -205,12 +219,6 @@ interface AuthContextType {
       } else {
         console.error("Invalid user data provided to login")
       }
-    }
-  
-    const logout = () => {
-      setUser(null)
-      localStorage.removeItem("user")
-      router.push("/login")
     }
   
     return (

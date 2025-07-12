@@ -32,7 +32,7 @@ import {
 } from "lucide-react";
 import type { Chapter, Teacher, Lesson } from "@/app/page";
 import { useAuth } from "@/hooks/use-auth";
-import { toast } from "./ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { baseUrl } from "../../constant";
 interface ChapterDetailsModalProps {
   chapter: Chapter | null;

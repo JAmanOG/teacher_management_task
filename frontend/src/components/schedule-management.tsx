@@ -32,7 +32,7 @@ import {
 } from "lucide-react";
 import type { Schedule, Teacher } from "@/app/page";
 import { useAuth } from "@/hooks/use-auth";
-import { toast } from "./ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { baseUrl } from "../../constant";
 import type { Lesson, Class } from "@/app/page";
 
@@ -399,7 +399,7 @@ export function ScheduleManagement({
       }
 
       // const updatedSchedule: Schedule = await response.json();
-      
+
       toast({
         title: "Schedule Updated",
         description: "The schedule has been successfully updated.",

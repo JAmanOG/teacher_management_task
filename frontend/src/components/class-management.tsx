@@ -220,7 +220,7 @@ export function ClassManagement({
       toast({
         title: "No Changes",
         description: "No changes were made to the class.",
-        variant: "info",
+        variant: "default",
       });
       setEditingClass(null);
       return;
