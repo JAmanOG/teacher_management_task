@@ -3,6 +3,7 @@ import ApiResponse from "../../utils/apiResponse.js";
 import { ApiError } from "../../utils/apiError.js";
 import db from "../../db/indexDb.js";
 import { lessons, chapters } from "../../db/schema.js";
+import { eq } from "drizzle-orm";
 
 // - GET /lessons
 // - GET /lessons/:id
@@ -28,7 +29,7 @@ const getAllLessons = asynchandler(async (req, res) => {
   
   return res
     .status(200)
-    .json(ApiResponse.success(lessonsList, "Lessons retrieved successfully"));
+    .json(new ApiResponse(200, lessonsList, "Lessons retrieved successfully"));
   
 });
 
@@ -43,11 +44,13 @@ const getLessonById = asynchandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(ApiResponse.success(lesson, "Lesson retrieved successfully"));
+    .json(new ApiResponse(200, lesson, "Lesson retrieved successfully"));
 });
 
 const createLesson = asynchandler(async (req, res) => {
-  const { title, chapterId, notes, duration } = req.body;
+  const { title, chapterId, isCompleted, notes, duration } = req.body;
+
+  console.log("Creating lesson with data:", req.body);
 
   if (!title || !chapterId || !notes || !duration) {
     throw new ApiError(
@@ -56,10 +59,22 @@ const createLesson = asynchandler(async (req, res) => {
     );
   }
 
+  const chapter = await db.select().from(chapters).where(eq(chapters.id, chapterId)).limit(1);
+  if (!chapter || chapter.length === 0) {
+    throw new ApiError(404, "Chapter not found");
+  }
+
+
   const newLesson = await db
     .insert(lessons)
-    .values({ title, chapterId, notes, duration })
-    .returning("*");
+    .values({ 
+      title, 
+      chapterId,
+      isCompleted,
+      notes, 
+      duration 
+    })
+    .returning();
 
   if (!newLesson || newLesson.length === 0) {
     throw new ApiError(500, "Failed to create lesson");
@@ -67,14 +82,16 @@ const createLesson = asynchandler(async (req, res) => {
 
   return res
     .status(201)
-    .json(
-      ApiResponse.success(res, "Lesson created successfully", newLesson[0])
-    );
+    .json(new ApiResponse(201, newLesson[0], "Lesson created successfully"));
 });
+
 
 const updateLesson = asynchandler(async (req, res) => {
   const { id } = req.params;
-  const { title, chapterId, notes, duration } = req.body;
+  const { title, chapterId, notes, duration, isCompleted, completedDate } = req.body;
+
+  console.log("Updating lesson with ID:", id);
+  console.log("Update data:", req.body);
 
   if (!title || !chapterId || !notes || !duration) {
     throw new ApiError(
@@ -85,9 +102,9 @@ const updateLesson = asynchandler(async (req, res) => {
 
   const updatedLesson = await db
     .update(lessons)
-    .set({ title, chapterId, notes, duration })
-    .where({ id })
-    .returning("*");
+    .set({ title, chapterId, notes, duration, isCompleted, completedDate: completedDate ? new Date(completedDate) : undefined })
+    .where(eq(lessons.id, id))
+    .returning();
 
   if (!updatedLesson || updatedLesson.length === 0) {
     throw new ApiError(404, "Lesson not found");
@@ -95,9 +112,7 @@ const updateLesson = asynchandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(
-      ApiResponse.success(res, "Lesson updated successfully", updatedLesson[0])
-    );
+    .json(new ApiResponse(200, updatedLesson[0], "Lesson updated successfully"));
 });
 
 const deleteLesson = asynchandler(async (req, res) => {
@@ -111,8 +126,7 @@ const deleteLesson = asynchandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(
-      ApiResponse.success(res, "Lesson deleted successfully", deletedLesson[0])
+    .json(new ApiResponse(200, deletedLesson[0], "Lesson deleted successfully")
     );
 });
 
@@ -131,9 +145,7 @@ const completeLesson = asynchandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(
-      ApiResponse.success(res, "Lesson marked as completed", updatedLesson[0])
-    );
+    .json(new ApiResponse(200, updatedLesson[0], "Lesson marked as completed"));
 });
 
 const getLessonsByChapter = asynchandler(async (req, res) => {
@@ -158,7 +170,7 @@ const getLessonsByChapter = asynchandler(async (req, res) => {
   }
     return res
         .status(200)
-        .json(ApiResponse.success(res, "Lessons retrieved successfully", lessonsList));
+        .json(new ApiResponse(200, lessonsList, "Lessons retrieved successfully"));
 });
 
 export {

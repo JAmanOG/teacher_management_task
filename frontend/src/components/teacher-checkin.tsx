@@ -42,7 +42,7 @@ export function TeacherCheckIn({ currentUser, checkInRecords, onCheckIn, onCheck
     onCheckIn({
       teacherId: currentUser.id,
       checkInTime: now.toISOString(),
-      location: "Main Campus", // This could be dynamic based on geolocation
+      location: "Main Campus",
       status: "Present",
     })
   }
@@ -123,7 +123,7 @@ export function TeacherCheckIn({ currentUser, checkInRecords, onCheckIn, onCheck
             <div className="flex items-center space-x-2">
               <Calendar className="h-4 w-4 text-muted-foreground" />
               <div>
-                <p className="text-sm font-medium">Today's Status</p>
+                <p className="text-sm font-medium">Today&apos;s Status</p>
                 <p className="text-sm">{todayRecord ? "Present" : "Not checked in"}</p>
               </div>
             </div>

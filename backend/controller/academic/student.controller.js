@@ -17,12 +17,15 @@ const getAllStudents = asynchandler(async (req, res) => {
   const studentsList = await db.select().from(students);
 
   if (!studentsList || studentsList.length === 0) {
-    throw new ApiError(404, "No students found");
+    // throw new ApiError(404, "No students found");
+    return res
+      .status(200)
+      .json(new ApiResponse(200,  [], "No students found"));
   }
 
   return res
     .status(200)
-    .json(ApiResponse.success("Students retrieved successfully", studentsList));
+    .json(new ApiResponse(200, studentsList, "Students retrieved successfully"));
 });
 
 const getStudentById = asynchandler(async (req, res) => {
@@ -36,7 +39,7 @@ const getStudentById = asynchandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(ApiResponse.success("Student retrieved successfully", student));
+    .json(new ApiResponse(200, student, "Student retrieved successfully"));
 });
 
 const createStudent = asynchandler(async (req, res) => {
@@ -53,7 +56,7 @@ const createStudent = asynchandler(async (req, res) => {
     }
     return res
         .status(201)
-        .json(ApiResponse.success("Student created successfully", newStudent[0]));
+        .json(new ApiResponse(201, newStudent[0], "Student created successfully"));
 });
 
 const updateStudent = asynchandler(async (req, res) => {
@@ -76,7 +79,7 @@ const updateStudent = asynchandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(ApiResponse.success("Student updated successfully", updatedStudent[0]));
+    .json(new ApiResponse(200, updatedStudent[0], "Student updated successfully"));
 });
 
 const deleteStudent = asynchandler(async (req, res) => {
@@ -93,7 +96,7 @@ const deleteStudent = asynchandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(ApiResponse.success("Student deleted successfully", deletedStudent[0]));
+    .json(new ApiResponse(200, deletedStudent[0], "Student deleted successfully"));
 });
 
 const getStudentsByClass = asynchandler(async (req, res) => {
@@ -110,7 +113,7 @@ const getStudentsByClass = asynchandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(ApiResponse.success("Students retrieved successfully", studentsList));
+    .json(new ApiResponse(200, studentsList, "Students retrieved successfully"));
 });
 
 // TODO: later other things 

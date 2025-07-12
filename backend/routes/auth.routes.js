@@ -1,13 +1,15 @@
 import { Router } from "express";
 import { auth } from "../middleware/auth.middleware.js";
-import {BulkDeleteUsers,Register,changeUserPassword,deleteUserById,exportUsers,getUserById,getUserProfile,getUserStatus,login,logout,searchUsers,updateUserById,updateUserProfile,updateUserStatus} from "../controller/auth/user.controller.js";
+import {BulkDeleteUsers,Register,changeUserPassword,deleteUserById,exportUsers,getUserById,getUserProfile,getUserStatus,login,logout,searchUsers,updateUserById,updateUserProfile,updateUserStatus,getAllUserByRole,GettingAccessToken} from "../controller/auth/user.controller.js";
 
 const router = Router();
 
 router.post("/register", Register);
 router.post("/login", login);
 router.post("/logout", auth.user, logout);
+router.post("/access-token", GettingAccessToken);
 router.get("/profile", auth.user, getUserProfile);
+router.get("/all-users", auth.user, getAllUserByRole);
 router.get("/profile/:id", auth.user, getUserById);
 router.put("/users/profile", auth.user, updateUserProfile);
 router.put("/profile/:id", auth.user, updateUserById);

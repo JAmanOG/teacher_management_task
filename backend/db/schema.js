@@ -2,6 +2,7 @@ import {
   pgTable,
   uuid,
   varchar,
+  json,
   timestamp,
   text,
   integer,
@@ -10,10 +11,12 @@ import {
   doublePrecision,
   boolean,
   pgEnum,
+  jsonb,
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
+import { desc, sql } from "drizzle-orm";
 import { relations } from "drizzle-orm/relations";
 import pkg from 'pg/lib/defaults.js';
+// import { jsonb } from "drizzle-orm/pg-core"; 
 
 const { password } = pkg;
 
@@ -38,7 +41,7 @@ export const ChapterStatus = pgEnum("chapter_status", [
     "Completed",
     "Overdue",
   ]);
-  
+
   export const daysOfWeek = pgEnum("days_of_week", [
     "Monday",
     "Tuesday",
@@ -70,7 +73,7 @@ export const users = pgTable("users", {
   avatar: varchar("avatar", { length: 500 }),
   joinDate: timestamp("join_date"),
   passwordHash: varchar("password_hash", { length: 255 }).notNull(),
-  refreshToken: text("refreshToken"),
+  refreshToken: text("refresh_token"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow().$onUpdate(),
 });
@@ -129,9 +132,16 @@ export const userPermissions = pgTable(
 );
 
 export const classes = pgTable("classes", {
-  id: uuid("id").primaryKey(),
+  id: uuid("id").primaryKey().defaultRandom(),
   name: varchar("name", { length: 100 }).notNull(),
-  gradeLevel: varchar("grade_level", { length: 20 }),
+  gradeLevel: varchar("grade_level", { length: 50 }),
+  section: varchar("section", { length: 10 }),
+  capacity: integer("capacity").default(30),
+  classTeacherId: uuid("class_teacher_id")
+    .references(() => users.id, { onDelete: "set null" }),
+  room: varchar("room", { length: 50 }),
+  description: text("description"),
+  subjects: json("subjects").notNull().default([]),
   academicYear: varchar("academic_year", { length: 20 }),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow().$onUpdate(),
@@ -158,7 +168,7 @@ export const userClasses = pgTable(
 
 
 export const chapters = pgTable("chapters", {
-  id: uuid("id").primaryKey(),
+  id: uuid("id").primaryKey().defaultRandom(),
   title: varchar("title", { length: 255 }).notNull(),
   subject: varchar("subject", { length: 100 }).notNull(),
   totalLessons: integer("total_lessons").default(0),
@@ -171,12 +181,16 @@ export const chapters = pgTable("chapters", {
     .references(() => classes.id, { onDelete: "cascade" }),
   dueDate: timestamp("due_date"),
   status: ChapterStatus("status").default("Not Started"),
+  description: text("description"),
+  objectives: json("objectives").notNull().default([]),
+  resources: json("resources").notNull().default([]),
+  difficulty: varchar("difficulty", { length: 50 }),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow().$onUpdate(),
 });
 
 export const lessons = pgTable("lessons", {
-  id: uuid("id").primaryKey(),
+  id: uuid("id").primaryKey().defaultRandom(),
   title: varchar("title", { length: 255 }).notNull(),
   chapterId: uuid("chapter_id")
     .notNull()
@@ -191,7 +205,7 @@ export const lessons = pgTable("lessons", {
 
 
 export const schedules = pgTable("schedules", {
-  id: uuid("id").primaryKey(),
+  id: uuid("id").primaryKey().defaultRandom(),
   teacherId: uuid("teacher_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),

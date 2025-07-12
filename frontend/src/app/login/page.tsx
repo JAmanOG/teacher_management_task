@@ -17,6 +17,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, GraduationCap } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { baseUrl } from "../../../constant";
 
 const DEMO_USERS = [
   {
@@ -45,12 +46,12 @@ const DEMO_USERS = [
   },
 ];
 
-interface User {
-  email: string;
-  password: string;
-  role: "Admin" | "Principal" | "Teacher" | "Head Teacher";
-  name: string;
-}
+// interface User {
+//   email: string;
+//   password: string;
+//   role: "Admin" | "Principal" | "Teacher" | "Head Teacher";
+//   name: string;
+// }
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -68,20 +69,33 @@ export default function LoginPage() {
 
     try {
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      const user = DEMO_USERS.find(
-        (u) => u.email === email && u.password === password
-      ) as User | undefined;
+      // const user = DEMO_USERS.find(
+      //   (u) => u.email === email && u.password === password
+      // ) as User | undefined;
 
+      const response = await fetch(`${baseUrl}/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ email, password }),
+      });
+
+      const user = await response.json();
+
+      console.log("Login response:", user);
       if (!user) {
         setError("Invalid email or password");
         return;
       }
 
-      login(user);
+      login(user.data);
       router.push("/");
     } catch (err) {
+      console.log(err)
       setError("Login failed. Please try again.");
     } finally {
       setIsLoading(false);
@@ -167,6 +181,19 @@ export default function LoginPage() {
               </p>
             </div>
           </div>
+
+              <div>
+                <p className="text-sm text-muted-foreground mt-4">
+                  Don&apos;t have an account?{" "}
+                  <a
+                    href="/register"
+                    className="text-primary hover:underline"
+                  >
+                    Register here
+                  </a>
+                </p>
+              </div>
+
         </CardContent>
       </Card>
     </div>

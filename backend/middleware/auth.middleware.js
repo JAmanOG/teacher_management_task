@@ -4,30 +4,39 @@ import { asynchandler } from "../utils/asynchandler.js";
 import db from "../db/indexDb.js";
 import { users } from "../db/schema.js";
 import { eq } from "drizzle-orm";
+import dotenv from "dotenv";
+dotenv.config();
+const { ACCESS_TOKEN_SECRET } = process.env;
 
 export const isAuthenticated = asynchandler(async (req, res, next) => {
   try {
     const token =
       req.cookies?.accessToken ||
-      req.headers("authorization")?.replace("Bearer ", "");
+      req.headers.authorization?.replace("Bearer ", "");
+
+      console.log("Token received:", token);
 
     if (!token) {
       throw new ApiError(401, "Access token is missing");
     }
 
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("Verifying token...",ACCESS_TOKEN_SECRET);
 
-    const user = await db
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+
+    const results = await db
       .select()
       .from(users)
-      .where(eq(users.id, decodedToken.id))
-      .first();
+      .where(eq(users.id, decodedToken._id));
+    
+    const user = results[0];
     if (!user) {
       throw new ApiError(401, "User not found");
     }
 
     const { password, ...userWithoutPassword } = user;
     req.user = userWithoutPassword;
+    console.log("User authenticated")
     next();
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {

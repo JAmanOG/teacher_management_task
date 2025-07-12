@@ -3,21 +3,11 @@ import React from "react";
 import {
   Calendar,
   Home,
-  Inbox,
-  Search,
-  Settings,
-  User2,
-  ChevronDown,
-  ChevronUp,
-  Plus,
   Users,
   BookOpen,
   Shield,
-  BarChart3,
+  
   LogOut,
-  Menu,
-  X,
-  // GraduationCap,
   Clock,
   MessageSquare,
   GraduationCap,
@@ -30,23 +20,11 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarGroupAction,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarFooter,
 } from "@/components/ui/sidebar";
 import { useSidebar } from "@/components/ui/sidebar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 
@@ -54,196 +32,10 @@ interface SidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
 }
-
-interface NavigationItem {
-  id: string;
-  label: string;
-  icon: any;
-  permission: string | null;
-  roleRestriction?: string;
-}
-
-// export function AppSidebar({activeTab, onTabChange}: SidebarProps) {
-//   const {
-//     state,
-//     open,
-//     setOpen,
-//     openMobile,
-//     setOpenMobile,
-//     isMobile,
-//     toggleSidebar,
-//   } = useSidebar();
-
-//   const items = [
-//     {
-//       id: "dashboard",
-//       label: "Dashboard",
-//       icon: Home,
-//       permission: null,
-//     },
-//     {
-//       id: "teachers",
-//       label: "Teachers",
-//       icon: Users,
-//       permission: "view_teachers",
-//     },
-//     {
-//       id: "lessons",
-//       label: "Lesson Tracker",
-//       icon: BookOpen,
-//       permission: "view_lessons",
-//     },
-//     {
-//       id: "schedule",
-//       label: "Schedule",
-//       icon: Calendar,
-//       permission: "view_lessons",
-//     },
-//     {
-//       id: "reports",
-//       label: "Reports",
-//       icon: BarChart3,
-//       permission: "view_reports",
-//     },
-//     {
-//       id: "roles",
-//       label: "Role Management",
-//       icon: Shield,
-//       permission: "manage_roles",
-//     },
-//     {
-//       id: "notifications",
-//       label: "Notifications",
-//       icon: Bell,
-//       permission: "view_teachers",
-//     },
-//     {
-//       id: "settings",
-//       label: "Settings",
-//       icon: Settings,
-//       permission: "manage_system",
-//     },
-//   ];
-
-//   const { user, logout } = useAuth()
-
-//   const hasPermission = (permission: string | null) => {
-//     if (!permission) return true
-//     return user?.permissions?.includes(permission) || false
-//   }
-
-//   const getInitials = (name: string) => {
-//     return name
-//       .split(" ")
-//       .map((n) => n[0])
-//       .join("")
-//       .toUpperCase()
-//       .slice(0, 2)
-//   }
-
-//   const availableItems = NAVIGATION_ITEMS.filter((item) => hasPermission(item.permission))
-
-//   return (
-//     <Sidebar collapsible="icon">
-//       <SidebarContent>
-//         <SidebarGroup>
-//           <SidebarGroupLabel>Application</SidebarGroupLabel>
-//           <SidebarGroupContent>
-//             <SidebarMenu>
-//               <DropdownMenu>
-//                 <DropdownMenuTrigger asChild>
-//                   <SidebarMenuButton>
-//                     Select Workspace
-//                     <ChevronDown className="ml-auto" />
-//                   </SidebarMenuButton>
-//                 </DropdownMenuTrigger>
-//                 <DropdownMenuContent className="w-[--radix-popper-anchor-width]">
-//                   <DropdownMenuItem>
-//                     <span>Acme Inc</span>
-//                   </DropdownMenuItem>
-//                   <DropdownMenuItem>
-//                     <span>Acme Corp.</span>
-//                   </DropdownMenuItem>
-//                 </DropdownMenuContent>
-//               </DropdownMenu>
-
-//               {items.map((item) => (
-//                 <SidebarMenuItem key={item.title}>
-//                   <SidebarMenuButton asChild>
-//                     <a href={item.url}>
-//                       <item.icon />
-//                       <span>{item.title}</span>
-//                     </a>
-//                   </SidebarMenuButton>
-//                 </SidebarMenuItem>
-//               ))}
-//             </SidebarMenu>
-//           </SidebarGroupContent>
-//         </SidebarGroup>
-
-//         {/* <SidebarGroup>
-//           <SidebarGroupLabel>Application</SidebarGroupLabel>
-//           <SidebarGroupAction>
-//             <Plus /> <span className="sr-only">Add Project</span>
-//           </SidebarGroupAction>
-//           <SidebarGroupContent></SidebarGroupContent>
-//         </SidebarGroup> */}
-
-//         <Collapsible defaultOpen className="group/collapsible">
-//           <SidebarGroup>
-//             <SidebarGroupLabel asChild>
-//               <CollapsibleTrigger>
-//                 Help
-//                 <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
-//               </CollapsibleTrigger>
-//             </SidebarGroupLabel>
-//             <CollapsibleContent>
-//               <SidebarGroupContent />
-//             </CollapsibleContent>
-//           </SidebarGroup>
-//         </Collapsible>
-//       </SidebarContent>
-//       <SidebarFooter>
-//         <SidebarMenu>
-//           <SidebarMenuItem>
-//             <DropdownMenu>
-//               <DropdownMenuTrigger asChild>
-//                 <SidebarMenuButton>
-//                   <User2 /> Username
-//                   <ChevronUp className="ml-auto" />
-//                 </SidebarMenuButton>
-//               </DropdownMenuTrigger>
-//               <DropdownMenuContent
-//                 side="top"
-//                 className="w-[--radix-popper-anchor-width]"
-//               >
-//                 <DropdownMenuItem>
-//                   <span>Account</span>
-//                 </DropdownMenuItem>
-//                 <DropdownMenuItem>
-//                   <span>Billing</span>
-//                 </DropdownMenuItem>
-//                 <DropdownMenuItem>
-//                   <span>Sign out</span>
-//                 </DropdownMenuItem>
-//               </DropdownMenuContent>
-//             </DropdownMenu>
-//           </SidebarMenuItem>
-//         </SidebarMenu>
-//       </SidebarFooter>
-//     </Sidebar>
-//   );
-// }
-
 export function AppSidebar({ activeTab, onTabChange }: SidebarProps) {
   const {
-    state,
-    open,
-    setOpen,
-    openMobile,
     setOpenMobile,
     isMobile,
-    toggleSidebar,
   } = useSidebar();
 
   const items = [
@@ -302,12 +94,18 @@ export function AppSidebar({ activeTab, onTabChange }: SidebarProps) {
       icon: MessageSquare,
       permission: "view_teachers",
     },  
+    // {
+    //   id: "reports",
+    //   label: "Reports",
+    //   icon: BarChart3,
+    //   permission: "view_reports",
+    // },
     {
-      id: "reports",
-      label: "Reports",
-      icon: BarChart3,
-      permission: "view_reports",
-    },
+      id: "student-creation",
+      label: "Student Creation",
+      icon: GraduationCap,
+      permission: "manage_system",
+      },
     {
       id: "roles",
       label: "Role Management",
@@ -329,9 +127,9 @@ export function AppSidebar({ activeTab, onTabChange }: SidebarProps) {
     return user?.permissions?.includes(permission) || false;
   };
 
-  const getInitials = (name: string) => {
-    if (!name) return "U";
-    return name
+  const getInitials = (fullName: string) => {
+    if (!fullName) return "U";
+    return fullName
       .split(" ")
       .map((n) => n[0])
       .join("")
@@ -373,10 +171,10 @@ export function AppSidebar({ activeTab, onTabChange }: SidebarProps) {
               <div className="flex items-center gap-2 px-2 py-3 border-b border-border/50">
                 {/* <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-medium text-sm"> */}
                 <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-white border-[1px] font-medium text-sm">
-                  {getInitials(user.name)}
+                  {getInitials(user.fullName)}
                 </div>
                 <div className="group-data-[collapsible=icon]:hidden flex-1 min-w-0">
-                  <p className="font-medium text-sm truncate">{user.name}</p>
+                  <p className="font-medium text-sm truncate">{user.fullName}</p>
                   <p className="text-xs text-muted-foreground capitalize">
                     {user.role}
                   </p>

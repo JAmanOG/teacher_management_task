@@ -18,10 +18,10 @@ interface LessonTrackerProps {
   teachers: Teacher[]
   onUpdateChapter: (chapter: Chapter) => void
   onViewChapter: (chapter: Chapter) => void
-  canEdit: boolean
+  canEdit?: boolean
 }
 
-export function LessonTracker({ chapters, teachers, onUpdateChapter, onViewChapter, canEdit }: LessonTrackerProps) {
+export function LessonTracker({ chapters, teachers, onUpdateChapter, onViewChapter }: LessonTrackerProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [subjectFilter, setSubjectFilter] = useState<string>("all")
@@ -96,12 +96,6 @@ export function LessonTracker({ chapters, teachers, onUpdateChapter, onViewChapt
     setSelectedChapter(null)
     setCompletedLessons("")
     setNotes("")
-  }
-
-  const openUpdateDialog = (chapter: Chapter) => {
-    setSelectedChapter(chapter)
-    setCompletedLessons(chapter.completedLessons.toString())
-    setIsUpdateDialogOpen(true)
   }
 
   const subjects = [...new Set(chapters.map((c) => c.subject))]

@@ -3,6 +3,7 @@ import ApiResponse from "../../utils/apiResponse.js";
 import { ApiError } from "../../utils/apiError.js";
 import db from "../../db/indexDb.js";
 import { schedules } from "../../db/schema.js";
+import { eq } from "drizzle-orm";
 
 // - GET /schedules
 // - GET /schedules/:id
@@ -38,13 +39,7 @@ const getAllSchedules = asynchandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(
-      ApiResponse.success(
-        res,
-        "Schedules retrieved successfully",
-        schedulesList
-      )
-    );
+    .json(new ApiResponse(200, schedulesList, "Schedules retrieved successfully")); 
 });
 
 const getScheduleById = asynchandler(async (req, res) => {
@@ -58,13 +53,11 @@ const getScheduleById = asynchandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(
-      ApiResponse.success(res, "Schedule retrieved successfully", schedule)
-    );
+    .json(new ApiResponse(200, schedule, "Schedule retrieved successfully"));
 });
 
 const createSchedule = asynchandler(async (req, res) => {
-  const { teacherId, classId, subject, room, dayOfWeek, startTime, endTime } =
+  const { teacherId, classId, subject, room, dayOfWeek, timeSlot } =
     req.body;
 
   if (
@@ -73,11 +66,11 @@ const createSchedule = asynchandler(async (req, res) => {
     !subject ||
     !room ||
     !dayOfWeek ||
-    !startTime ||
-    !endTime
-  ) {
+    !timeSlot ) {
     throw new ApiError(400, "All fields are required");
   }
+  
+  console.log("body", req.body);
 
   const newSchedule = await db
     .insert(schedules)
@@ -87,23 +80,18 @@ const createSchedule = asynchandler(async (req, res) => {
       subject,
       room,
       dayOfWeek,
-      timeSlot: {
-        startTime,
-        endTime,
-      },
+      timeSlot: timeSlot,
     })
-    .returning("*");
+    .returning();
 
   return res
     .status(201)
-    .json(
-      ApiResponse.success(res, "Schedule created successfully", newSchedule[0])
-    );
+    .json(new ApiResponse(201, newSchedule[0], "Schedule created successfully"));
 });
 
 const updateSchedule = asynchandler(async (req, res) => {
   const { id } = req.params;
-  const { teacherId, classId, subject, room, dayOfWeek, startTime, endTime } =
+  const { teacherId, classId, subject, room, dayOfWeek, timeSlot } =
     req.body;
 
   if (
@@ -112,8 +100,7 @@ const updateSchedule = asynchandler(async (req, res) => {
     !subject ||
     !room ||
     !dayOfWeek ||
-    !startTime ||
-    !endTime
+    !timeSlot
   ) {
     throw new ApiError(400, "All fields are required");
   }
@@ -126,10 +113,10 @@ const updateSchedule = asynchandler(async (req, res) => {
       subject,
       room,
       dayOfWeek,
-      timeSlot: { startTime, endTime },
+      timeSlot,
     })
-    .where({ id })
-    .returning("*");
+    .where(eq(schedules.id, id))
+    .returning();
 
   if (!updatedSchedule || updatedSchedule.length === 0) {
     throw new ApiError(404, "Schedule not found");
@@ -137,13 +124,7 @@ const updateSchedule = asynchandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(
-      ApiResponse.success(
-        res,
-        "Schedule updated successfully",
-        updatedSchedule[0]
-      )
-    );
+    .json(new ApiResponse(200, updatedSchedule[0], "Schedule updated successfully"));
 });
 
 const deleteSchedule = asynchandler(async (req, res) => {
@@ -158,13 +139,7 @@ const deleteSchedule = asynchandler(async (req, res) => {
   }
   return res
     .status(200)
-    .json(
-      ApiResponse.success(
-        res,
-        "Schedule deleted successfully",
-        deletedSchedule[0]
-      )
-    );
+    .json(new ApiResponse(200, deletedSchedule[0], "Schedule deleted successfully"));
 });
 
 const getSchedulesByTeacher = asynchandler(async (req, res) => {
@@ -186,9 +161,7 @@ const getSchedulesByTeacher = asynchandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(
-      ApiResponse.success(res, "Schedules retrieved successfully", schedulesList)
-    );
+    .json(new ApiResponse(200, schedulesList, "Schedules retrieved successfully"));
 });
 
 const getSchedulesByDay = asynchandler(async (req, res) => {
@@ -209,9 +182,7 @@ const getSchedulesByDay = asynchandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(
-      ApiResponse.success(res, "Schedules retrieved successfully", schedulesList)
-    );
+    .json(new ApiResponse(200, schedulesList, "Schedules retrieved successfully"));
 });
 
 const getSchedulesByClass = asynchandler(async (req, res) => {
@@ -232,9 +203,7 @@ const getSchedulesByClass = asynchandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(
-      ApiResponse.success(res, "Schedules retrieved successfully", schedulesList)
-    );
+    .json(new ApiResponse(200, schedulesList, "Schedules retrieved successfully"));
 });
 
 export {

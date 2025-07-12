@@ -13,11 +13,11 @@ import type { Student, Teacher } from "@/app/page"
 
 interface StudentManagementProps {
   students: Student[]
-  teachers: Teacher[]
+  teachers?: Teacher[]
   currentUser: Teacher
 }
 
-export function StudentManagement({ students, teachers, currentUser }: StudentManagementProps) {
+export function StudentManagement({ students, currentUser }: StudentManagementProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const [classFilter, setClassFilter] = useState<string>("all")
   const [subjectFilter, setSubjectFilter] = useState<string>("all")

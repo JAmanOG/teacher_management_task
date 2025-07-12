@@ -1,17 +1,31 @@
-"use client"
+"use client";
 
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import type { Teacher, UserRole } from "@/app/page"
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormDescription,
+} from "@/components/ui/form";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { Teacher, UserRole } from "@/app/page";
 
 const teacherSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters"),
@@ -22,19 +36,20 @@ const teacherSchema = z.object({
   role: z.string().min(1, "Please select a role"),
   assignedClasses: z.array(z.string()).optional(),
   permissions: z.array(z.string()).optional(),
-})
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
 
-type TeacherFormData = z.infer<typeof teacherSchema>
+type TeacherFormData = z.infer<typeof teacherSchema>;
 
 interface TeacherFormProps {
-  initialData?: Teacher
-  onSubmit: (data: Omit<Teacher, "id">) => void
-  onCancel: () => void
-  isLoading: boolean
-  subjects: string[]
-  roles: string[]
-  userRoles: UserRole[]
-  canManageRoles: boolean
+  initialData?: Teacher;
+  onSubmit: (data: Omit<Teacher, "id">) => void;
+  onCancel: () => void;
+  isLoading: boolean;
+  subjects: string[];
+  roles: string[];
+  userRoles: UserRole[];
+  canManageRoles: boolean;
 }
 
 export function TeacherForm({
@@ -53,20 +68,21 @@ export function TeacherForm({
       fullName: initialData?.fullName || "",
       email: initialData?.email || "",
       phoneNumber: initialData?.phoneNumber || "",
+      password: initialData?.password || "",
       subject: initialData?.subject || "",
       status: initialData?.status || "Active",
       role: initialData?.role || "Teacher",
       assignedClasses: initialData?.assignedClasses || [],
       permissions: initialData?.permissions || [],
     },
-  })
+  });
 
-  const selectedRole = form.watch("role")
-  const selectedUserRole = userRoles.find((r) => r.name === selectedRole)
+  const selectedRole = form.watch("role");
+  const selectedUserRole = userRoles.find((r) => r.name === selectedRole);
 
   const handleSubmit = (data: TeacherFormData) => {
     // Auto-assign permissions based on role if role management is enabled
-    const rolePermissions = selectedUserRole?.permissions || []
+    const rolePermissions = selectedUserRole?.permissions || [];
 
     onSubmit({
       ...data,
@@ -74,8 +90,8 @@ export function TeacherForm({
       avatar: initialData?.avatar,
       joinDate: initialData?.joinDate,
       permissions: canManageRoles ? data.permissions : rolePermissions,
-    })
-  }
+    });
+  };
 
   return (
     <Form {...form}>
@@ -102,7 +118,11 @@ export function TeacherForm({
               <FormItem>
                 <FormLabel>Email Address *</FormLabel>
                 <FormControl>
-                  <Input type="email" placeholder="Enter email address" {...field} />
+                  <Input
+                    type="email"
+                    placeholder="Enter email address"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -125,11 +145,32 @@ export function TeacherForm({
 
           <FormField
             control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password *</FormLabel>
+                <FormControl>
+                  <Input
+                    type="password"
+                    placeholder="Enter password"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
             name="subject"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Subject *</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select a subject" />
@@ -156,7 +197,10 @@ export function TeacherForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Role *</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select a role" />
@@ -171,7 +215,11 @@ export function TeacherForm({
                   </SelectContent>
                 </Select>
                 <FormMessage />
-                {selectedUserRole && <FormDescription>{selectedUserRole.description}</FormDescription>}
+                {selectedUserRole && (
+                  <FormDescription>
+                    {selectedUserRole.description}
+                  </FormDescription>
+                )}
               </FormItem>
             )}
           />
@@ -223,22 +271,34 @@ export function TeacherForm({
                           name="permissions"
                           render={({ field }) => {
                             return (
-                              <FormItem key={permission} className="flex flex-row items-start space-x-3 space-y-0">
+                              <FormItem
+                                key={permission}
+                                className="flex flex-row items-start space-x-3 space-y-0"
+                              >
                                 <FormControl>
                                   <Checkbox
                                     checked={field.value?.includes(permission)}
                                     onCheckedChange={(checked) => {
                                       return checked
-                                        ? field.onChange([...(field.value ?? []), permission])
-                                        : field.onChange(field.value?.filter((value) => value !== permission))
+                                        ? field.onChange([
+                                            ...(field.value ?? []),
+                                            permission,
+                                          ])
+                                        : field.onChange(
+                                            field.value?.filter(
+                                              (value) => value !== permission
+                                            )
+                                          );
                                     }}
                                   />
                                 </FormControl>
                                 <FormLabel className="text-sm font-normal">
-                                  {permission.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                                  {permission
+                                    .replace(/_/g, " ")
+                                    .replace(/\b\w/g, (l) => l.toUpperCase())}
                                 </FormLabel>
                               </FormItem>
-                            )
+                            );
                           }}
                         />
                       ))}
@@ -252,14 +312,23 @@ export function TeacherForm({
         )}
 
         <div className="flex justify-end space-x-2 pt-4">
-          <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            disabled={isLoading}
+          >
             Cancel
           </Button>
           <Button type="submit" disabled={isLoading}>
-            {isLoading ? "Saving..." : initialData ? "Update Teacher" : "Add Teacher"}
+            {isLoading
+              ? "Saving..."
+              : initialData
+              ? "Update Teacher"
+              : "Add Teacher"}
           </Button>
         </div>
       </form>
     </Form>
-  )
+  );
 }

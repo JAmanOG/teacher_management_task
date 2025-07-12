@@ -3,6 +3,7 @@ import ApiResponse from "../../utils/apiResponse.js";
 import { ApiError } from "../../utils/apiError.js";
 import db from "../../db/indexDb.js";
 import { classes,userClasses } from "../../db/schema.js";
+import { eq, sql } from "drizzle-orm";
 
 // - GET /classes
 // - GET /classes/:id
@@ -21,7 +22,7 @@ const getAllClasses = asynchandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(ApiResponse.success("Classes retrieved successfully", classesList));
+    .json(new ApiResponse(200, classesList, "Classes retrieved successfully"));
 });
 
 const getClassById = asynchandler(async (req, res) => {
@@ -35,51 +36,135 @@ const getClassById = asynchandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(ApiResponse.success(classData, "Class retrieved successfully"));
+    .json(new ApiResponse(200, classData, "Class retrieved successfully"));
 });
 
 const createClass = asynchandler(async (req, res) => {
-  const { name, gradeLevel, academicYear } = req.body;
+  const {
+    name,
+    gradeLevel,
+    academicYear,
+    section,
+    capacity,
+    classTeacherId,
+    room,
+    description,
+    subjects,
+  } = req.body;
 
-  if (!name || !gradeLevel || !academicYear) {
-    throw new ApiError(400, "Name, gradeLevel and academicYear are required");
+  console.log("Creating class with data:", req.body);
+
+  if (
+    !name ||
+    !gradeLevel ||
+    !academicYear ||
+    !section ||
+    !capacity ||
+    !classTeacherId ||
+    !room ||
+    !description
+  ) {
+    throw new ApiError(400, "Missing required fields");
   }
+
+  const sanitizedSubjects = Array.isArray(subjects) ? subjects : [];
+
+  console.log("Sanitized subjects:", sanitizedSubjects);
+  console.log("typeof subjects:", typeof subjects);
+  console.log("Array.isArray(subjects):", Array.isArray(subjects));
 
   const newClass = await db
     .insert(classes)
-    .values({ name, gradeLevel, academicYear })
-    .returning("*");
-  if (!newClass || newClass.length === 0) {
+    .values({
+      name,
+      gradeLevel,
+      academicYear,
+      section,
+      capacity,
+      classTeacherId,
+      room,
+      description,
+      subjects: sanitizedSubjects,
+    })
+    .returning();
+
+  if (!newClass[0]) {
     throw new ApiError(500, "Failed to create class");
   }
 
+  const responseData = {
+    id: newClass[0].id,
+    name: newClass[0].name,
+    gradeLevel: newClass[0].gradeLevel,
+    academicYear: newClass[0].academicYear,
+    section: newClass[0].section,
+    capacity: newClass[0].capacity,
+    classTeacherId: newClass[0].classTeacherId,
+    room: newClass[0].room,
+    description: newClass[0].description,
+    subjects: newClass[0].subjects,
+  };
+
+  console.log("Class created successfully:", responseData);
+
   res
     .status(201)
-    .json(ApiResponse.success("Class created successfully", newClass[0]));
+    .json(new ApiResponse(200,responseData, "Class created successfully"));
 });
-
 
 const updateClass = asynchandler(async (req, res) => {
   const { id } = req.params;
-  const { name, gradeLevel, academicYear } = req.body;
+  const { name, gradeLevel, academicYear, section, capacity, classTeacherId, room, description, subjects } = req.body;
 
-  if (!name || !gradeLevel || !academicYear) {
-    throw new ApiError(400, "Name, gradeLevel and academicYear are required");
+  console.log("Updating class with ID:", id, "and data:", req.body);
+
+  if (!name || !gradeLevel || !academicYear || !section || !capacity || !classTeacherId || !room || !description) {
+    throw new ApiError(400, "All fields are required");
   }
 
+  const sanitizedSubjects = Array.isArray(subjects) ? subjects : [];
+
+  console.log("Sanitized subjects:", sanitizedSubjects);
+  console.log("typeof subjects:", typeof subjects);
+  console.log("Array.isArray(subjects):", Array.isArray(subjects));
+  
+
   const updatedClass = await db
-    .update(classes)
-    .set({ name, gradeLevel, academicYear })
-    .where({ id })
-    .returning("*");
+  .update(classes)
+  .set({
+    name,
+    gradeLevel,
+    academicYear,
+    section,
+    capacity,
+    classTeacherId,
+    room,
+    description,
+    subjects: sanitizedSubjects,
+  })
+  .where(eq(classes.id, id))
+  .returning(); 
 
   if (!updatedClass || updatedClass.length === 0) {
     throw new ApiError(404, "Class not found or update failed");
   }
+  console.log("Class updated successfully:", updatedClass[0]);
+  const responseData = {
+    id: updatedClass[0].id,
+    name: updatedClass[0].name,
+    gradeLevel: updatedClass[0].gradeLevel,
+    academicYear: updatedClass[0].academicYear,
+    section: updatedClass[0].section,
+    capacity: updatedClass[0].capacity,
+    classTeacherId: updatedClass[0].classTeacherId,
+    room: updatedClass[0].room,
+    description: updatedClass[0].description,
+    subjects: updatedClass[0].subjects,
+  };
 
-  res
+  return res
     .status(200)
-    .json(ApiResponse.success(updatedClass[0], "Class updated successfully"));
+    .json(new ApiResponse(200, responseData, "Class updated successfully"));
 });
 
 const deleteClass = asynchandler(async (req, res) => {
@@ -87,8 +172,8 @@ const deleteClass = asynchandler(async (req, res) => {
 
   const deletedClass = await db
     .delete(classes)
-    .where({ id })
-    .returning("*");
+    .where(eq(classes.id, id))
+    .returning();
 
   if (!deletedClass || deletedClass.length === 0) {
     throw new ApiError(404, "Class not found");
@@ -96,7 +181,7 @@ const deleteClass = asynchandler(async (req, res) => {
 
   res
     .status(200)
-    .json(ApiResponse.success(deletedClass[0], "Class deleted successfully"));
+    .json(new ApiResponse(200, deletedClass[0], "Class deleted successfully"));
 });
 
 const getClassesByTeacherId = asynchandler(async (req, res) => {
@@ -113,7 +198,7 @@ const getClassesByTeacherId = asynchandler(async (req, res) => {
   
   return res
     .status(200)
-    .json(ApiResponse.success(classesList, "Classes retrieved successfully"));
+    .json(new ApiResponse(200, classesList, "Classes retrieved successfully"));
 });
 
 const assignTeacherToClass = asynchandler(async (req, res) => {
@@ -140,7 +225,7 @@ const assignTeacherToClass = asynchandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(ApiResponse.success(assignedTeacher[0], "Teacher assigned to class successfully"));
+    .json(new ApiResponse(200, assignedTeacher[0], "Teacher assigned to class successfully"));
 });
 
 export {

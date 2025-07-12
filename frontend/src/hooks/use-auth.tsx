@@ -2,10 +2,13 @@
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import { useRouter } from "next/navigation"
+import { parseCookies } from 'nookies'
+import { baseUrl } from "../../constant"
 
 interface User {
+  id: string
   email: string
-  name: string
+  fullName: string
   role: "Teacher" | "Head Teacher" | "Admin" | "Principal"
   permissions?: string[]
 }
@@ -15,13 +18,22 @@ interface AuthContextType {
     login: (userData: any) => void
     logout: () => void
     isLoading: boolean
+    accesstoken: string | null
+    refreshAccessToken: () => Promise<string | null>
   }
   
   const AuthContext = createContext<AuthContextType | undefined>(undefined)
-  
-  const ROLE_PERMISSIONS = {
+  interface ROLE_PERMISSIONSTYPE {
+    Teacher: string[];
+    "Head Teacher": string[];
+    Admin: string[];
+    Principal: string[];
+}
+
+  const ROLE_PERMISSIONS: ROLE_PERMISSIONSTYPE = {
     Teacher: ["view_teachers", "view_lessons", "edit_lessons"],
-    "Head Teacher": ["view_teachers", "add_teachers", "edit_teachers", "view_lessons", "edit_lessons", "view_reports"],
+    "Head Teacher": ["view_teachers","add_schedules","edit_schedules","delete_schedules","view_schedules",
+      "add_teachers", "edit_teachers", "view_lessons", "edit_lessons", "view_reports"],
     Admin: [
       "view_teachers",
       "add_teachers",
@@ -30,73 +42,166 @@ interface AuthContextType {
       "manage_roles",
       "view_lessons",
       "edit_lessons",
+      "view_lessons",
       "view_reports",
       "export_data",
-    ],
+      "view_classes",
+      "add_classes",
+      "edit_classes",
+      "delete_classes",
+      "manage_system",
+      "create_chapter",
+      "view_chapters",
+      "edit_chapter",
+      "delete_chapter",
+      "add_schedules",
+      "edit_schedules",
+      "delete_schedules",
+      "view_schedules",
+      ],
     Principal: [
+      "create_chapter",
+      "create_chapter",
+      "view_chapters",
+      "delete_chapter",
+      "edit_chapter",
       "view_teachers",
       "add_teachers",
       "edit_teachers",
       "delete_teachers",
       "manage_roles",
       "view_lessons",
+      "add_lessons",
       "edit_lessons",
       "view_reports",
       "export_data",
       "manage_system",
+      "view_classes",
+      "add_classes",
+      "edit_classes",
+      "delete_classes",
+      "add_schedules",
+      "edit_schedules",
+      "delete_schedules",
+      "view_schedules",
     ],
   }
 
-  interface ROLE_PERMISSIONSTYPE {
-        Teacher: string[];
-        "Head Teacher": string[];
-        Admin: string[];
-        Principal: string[];
-    }
 
   export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null)
     const [isLoading, setIsLoading] = useState(true)
+    const [accesstoken, setAccessToken] = useState<string | null>(null)
     const router = useRouter()
   
+
     useEffect(() => {
-      // Add proper error handling for localStorage access
-      try {
-        // Check for stored user on mount
-        const storedUser = typeof window !== 'undefined' ? localStorage.getItem("user") : null
-        
-        if (storedUser) {
-          const userData = JSON.parse(storedUser)
+      const initializeAuth = async () => {
+        try {
+          // Check for stored user and token on mount
+          const storedUser = typeof window !== 'undefined' ? localStorage.getItem("user") : null
+          const storedToken = typeof window !== 'undefined' ? localStorage.getItem("accessToken") : null
           
-          // Add null check before accessing role
-          if (userData && userData.role && ROLE_PERMISSIONS[userData.role]) {
-            setUser({
-              ...userData,
-              permissions: ROLE_PERMISSIONS[userData.role]
-            })
+          if (storedUser && storedToken) {
+            const userData:User = JSON.parse(storedUser)
+            
+            // Add null check before accessing role
+            if (userData && userData.role && ROLE_PERMISSIONS[userData.role]) {
+              setUser({
+                ...userData,
+                permissions: ROLE_PERMISSIONS[userData.role]
+              })
+              setAccessToken(storedToken)
+            } else {
+              // Handle invalid user data
+              console.warn("Invalid user data in localStorage")
+              localStorage.removeItem("user")
+              localStorage.removeItem("accessToken")
+            }
           } else {
-            // Handle invalid user data
-            console.warn("Invalid user data in localStorage")
-            localStorage.removeItem("user")
+            // No stored auth data, try to get a new access token with refresh token
+            const newToken = await refreshAccessToken()
+            if (!newToken) {
+              // No valid session, redirect to login
+              console.log("No valid session found")
+              // logout()
+            }
           }
+        } catch (error) {
+          console.error("Error initializing auth:", error)
+          localStorage.removeItem("user")
+          localStorage.removeItem("accessToken")
+        } finally {
+          setIsLoading(false)
         }
-      } catch (error) {
-        console.error("Error retrieving user from localStorage:", error)
-        localStorage.removeItem("user") // Remove potentially corrupt data
-      } finally {
-        setIsLoading(false)
       }
+      
+      initializeAuth()
     }, [])
+
+
+
+
+    const refreshAccessToken = async (): Promise<string | null> => {
+      try {
+        // Get refresh token from cookies
+        const cookies = parseCookies()
+        const refreshToken = cookies.refreshToken
+        
+        if (!refreshToken) {
+          console.warn("No refresh token available")
+          return null
+        }
+        
+        // Call the backend to get a new access token
+        const response = await fetch(`${baseUrl}/auth/access-token`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ refreshToken , user }) ,
+        })
+        
+        if (!response.ok) {
+          throw new Error('Failed to refresh token')
+        }
+        
+        const data = await response.json()
+        const newAccessToken = data.data.accessToken
+        
+        // Update access token in state
+        setAccessToken(newAccessToken)
+        localStorage.setItem("accessToken", newAccessToken)
+        
+        // // If we have user data, update it with the new token
+        // if (user) {
+        //   const updatedUser = { ...user, }
+        //   localStorage.setItem("user", JSON.stringify(updatedUser))
+        // }
+        
+        return newAccessToken
+      } catch (error) {
+        console.error("Error refreshing access token:", error)
+        logout()
+        return null
+      }
+    }
+  
   
     const login = (userData: any) => {
       // Add validation before setting user
-      if (userData && userData.role && ROLE_PERMISSIONS[userData.role]) {
+      const newUserData: User = userData.user
+      console.log("Login data received:", userData)
+      if (newUserData && newUserData.role && ROLE_PERMISSIONS[newUserData.role]) {
         const userWithPermissions = {
-          ...userData,
-          permissions: ROLE_PERMISSIONS[userData.role]
+          ...newUserData,
+          permissions: ROLE_PERMISSIONS[newUserData.role]
         }
         setUser(userWithPermissions)
+        setAccessToken(userData.accessToken)
+        
         localStorage.setItem("user", JSON.stringify(userWithPermissions))
+        localStorage.setItem("accessToken", userData.accessToken)
       } else {
         console.error("Invalid user data provided to login")
       }
@@ -114,7 +219,9 @@ interface AuthContextType {
           user,
           login,
           logout,
-          isLoading
+          accesstoken,
+          isLoading,
+          refreshAccessToken
         }}
       >
         {children}

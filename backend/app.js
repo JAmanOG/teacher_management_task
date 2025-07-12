@@ -3,15 +3,18 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import routes from './routes/main.routes.js';
 const app = express();
+// const { DATABASE_URL } = process.env;
 
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: 'http://localhost:3000',
     credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization']
     }));
 
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
+
 
 
 app.use("/api/v1", routes);
