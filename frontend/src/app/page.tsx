@@ -663,10 +663,6 @@ export default function TeacherManagement() {
 
   const currentUser:Teacher | null = user as Teacher | null
 
-  if (!user) {
-    router.push("/login");
-    return null;
-  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -861,6 +857,7 @@ export default function TeacherManagement() {
     return filtered;
   }, [teachers, searchTerm, statusFilter, subjectFilter, roleFilter, sortBy]);
 
+
   // Add authentication check
   if (authLoading) {
     return (
@@ -869,10 +866,11 @@ export default function TeacherManagement() {
       </div>
     );
   }
-
   if (!user) {
-    return null; // This will be handled by the auth provider
+    router.push("/login");
+    return null;
   }
+
 
   const handleAddStudent = (studentData: Omit<Student, "id">) => {
     const newStudent: Student = {

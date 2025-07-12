@@ -357,3 +357,306 @@ const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 ---
 
 This project represents a comprehensive solution for educational institution management with modern web technologies and best practices. The system is designed to be scalable, maintainable, and user-friendly while providing robust functionality for all stakeholders.
+
+
+# Backend
+# Teacher Management System
+
+A comprehensive web application for managing teachers, students, classes, and academic content in educational institutions. Built with Node.js, Express, and PostgreSQL with Drizzle ORM.
+
+## Table of Contents
+
+- Features
+- Tech Stack
+- Setup and Installation
+- API Documentation
+- Database Schema
+- Design Decisions
+- Assumptions
+- Project Structure
+
+## Features
+
+### 🔐 Authentication & Authorization
+- **User Registration & Login** with JWT-based authentication
+- **Role-based access control** (Teacher, Head Teacher, Admin, Principal)
+- **Permission management** system
+- **User profile management**
+
+### 👥 User Management
+- **Multi-role user system** with different permission levels
+- **User search and filtering**
+- **Bulk operations** (bulk delete, export)
+- **User status management** (Active, Inactive, Pending)
+
+### 📚 Academic Management
+- **Chapter Management**: Create, update, track progress of academic chapters
+- **Lesson Management**: Detailed lesson planning and tracking
+- **Class Management**: Organize students into classes with teachers
+- **Student Management**: Student profiles and academic tracking
+- **Schedule Management**: Class timetables and teacher schedules
+
+### 📊 Tracking & Reporting
+- **Check-in Records**: Teacher attendance tracking
+- **Comment System**: Chapter-wise comments and feedback
+- **Progress Tracking**: Monitor chapter and lesson completion
+- **Dashboard Statistics**: Overview of system metrics
+
+### 🔍 Advanced Features
+- **Search functionality** across multiple entities
+- **Export capabilities** (JSON, CSV)
+- **File management** (planned for future scope)
+- **Comprehensive API** with proper error handling
+
+## Tech Stack
+
+### Backend
+- **Node.js** with Express.js framework
+- **PostgreSQL** database
+- **Drizzle ORM** for database operations
+- **JWT** for authentication
+- **bcryptjs** for password hashing
+- **Jest** for testing
+- **Babel** for ES6+ transpilation
+
+### Development Tools
+- **Docker** support
+- **Nodemon** for development
+- **ESLint** and **Prettier** for code quality
+- **Drizzle Studio** for database management
+
+## Setup and Installation
+
+### Prerequisites
+- Node.js (v18 or higher)
+- PostgreSQL (v14 or higher)
+- npm or yarn
+
+### Installation Steps
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd teacher_management_task/backend
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Environment Configuration**
+   Create a `.env` file in the root directory:
+   ```env
+   DATABASE_URL=postgresql://username:password@localhost:5432/teacher_management
+   JWT_SECRET=your-secret-key
+   JWT_REFRESH_SECRET=your-refresh-secret
+   PORT=3000
+   NODE_ENV=development
+   ```
+
+4. **Database Setup**
+   ```bash
+   # Generate migrations
+   npm run db:generate
+   
+   # Run migrations
+   npm run db:migrate
+   
+   # Optional: Open Drizzle Studio
+   npm run db:studio
+   ```
+
+5. **Start the application**
+   ```bash
+   # Development mode
+   npm run dev
+   
+   # Production mode
+   npm start
+   ```
+
+6. **Run tests**
+   ```bash
+   npm test
+   ```
+
+### Docker Setup (Alternative)
+
+```bash
+# Build and run with Docker
+docker build -t teacher-management .
+docker run -p 3000:3000 teacher-management
+```
+
+## API Documentation
+
+### Authentication Endpoints
+- `POST /api/v1/auth/register` - User registration
+- `POST /api/v1/auth/login` - User login
+- `POST /api/v1/auth/logout` - User logout
+- `GET /api/v1/auth/profile` - Get user profile
+
+### Academic Management
+- `GET /api/v1/chapters` - Get all chapters
+- `POST /api/v1/chapters` - Create new chapter
+- `PUT /api/v1/chapters/:id` - Update chapter
+- `DELETE /api/v1/chapters/:id` - Delete chapter
+- `GET /api/v1/lessons` - Get all lessons
+- `POST /api/v1/lessons` - Create new lesson
+
+### User Management
+- `GET /api/v1/users` - Get all users
+- `GET /api/v1/users/:id` - Get user by ID
+- `PUT /api/v1/users/:id` - Update user
+- `DELETE /api/v1/users/:id` - Delete user
+
+### Classes & Students
+- `GET /api/v1/classes` - Get all classes
+- `POST /api/v1/classes` - Create new class
+- `GET /api/v1/students` - Get all students
+- `POST /api/v1/students` - Create new student
+
+## Database Schema
+
+### Core Tables
+
+#### Users
+- **Primary entities**: Teachers, Head Teachers, Admins, Principals
+- **Fields**: fullName, email, role, subject, status, avatar
+- **Relationships**: One-to-many with chapters, comments, check-in records
+
+#### Classes
+- **Purpose**: Organize students and academic content
+- **Fields**: name, gradeLevel, capacity, classTeacherId, subjects
+- **Relationships**: One-to-many with students, chapters, schedules
+
+#### Chapters
+- **Purpose**: Academic content organization
+- **Fields**: title, subject, totalLessons, completedLessons, status, difficulty
+- **Relationships**: Belongs to class and teacher, has many lessons
+
+#### Lessons
+- **Purpose**: Detailed lesson tracking
+- **Fields**: title, chapterId, isCompleted, notes, duration
+- **Relationships**: Belongs to chapter
+
+### Additional Tables
+- **Students**: Student profiles and academic records
+- **Schedules**: Class timetables and teacher schedules
+- **Comments**: Feedback and tracking system
+- **Permissions**: Fine-grained access control
+
+## Design Decisions
+
+### 1. **Database Architecture**
+- **Drizzle ORM**: Chosen for type safety and performance
+- **PostgreSQL**: Robust relational database for complex educational data
+- **UUID Primary Keys**: Better for distributed systems and security
+
+### 2. **Authentication Strategy**
+- **JWT with Refresh Tokens**: Secure, stateless authentication
+- **Role-based Access Control**: Hierarchical permission system
+- **Password Hashing**: bcryptjs for secure password storage
+
+### 3. **API Design**
+- **RESTful Architecture**: Standard HTTP methods and status codes
+- **Consistent Response Format**: Unified ApiResponse class
+- **Comprehensive Error Handling**: Custom ApiError class
+
+### 4. **Code Organization**
+- **MVC Pattern**: Clear separation of concerns
+- **Middleware Architecture**: Reusable authentication and validation
+- **Utility Functions**: Helper functions for common operations
+
+### 5. **Data Validation**
+- **Server-side Validation**: Comprehensive input validation
+- **Type Safety**: Leveraging TypeScript-like benefits with JSDoc
+- **Error Boundaries**: Graceful error handling throughout
+
+## Assumptions
+
+### 1. **Academic Structure**
+- Each class has one primary teacher (classTeacherId)
+- Chapters belong to specific classes and subjects
+- Lessons are organized under chapters
+- Academic year follows standard calendar structure
+
+### 2. **User Roles & Permissions**
+- **Teacher**: Basic access to their assigned classes and chapters
+- **Head Teacher**: Extended access to manage other teachers
+- **Admin**: System administration capabilities
+- **Principal**: Full access to all system features
+
+### 3. **Data Relationships**
+- Students belong to one class at a time
+- Teachers can teach multiple subjects and classes
+- Chapters have a linear progression (lessons completed sequentially)
+- Comments are primarily chapter-focused for academic tracking
+
+### 4. **System Constraints**
+- Single-tenant application (one school/institution)
+- English language interface
+- Standard academic calendar assumptions
+- Web-based access (no mobile-specific features)
+
+### 5. **Business Logic**
+- Chapter progress calculated based on completed lessons
+- Check-in system for teacher attendance tracking
+- Comments system for administrative feedback
+- Export functionality for data portability
+
+### 6. **Security Assumptions**
+- HTTPS in production environment
+- Regular security updates and patches
+- Proper environment variable management
+- Database access restrictions in production
+
+### 7. **Performance Considerations**
+- Moderate concurrent user load (school-sized)
+- Database indexing on frequently queried fields
+- Pagination for large data sets
+- Caching strategies for read-heavy operations
+
+## Project Structure
+
+```
+backend/
+├── controller/          # Route controllers
+│   ├── academic/       # Academic management
+│   ├── auth/           # Authentication
+│   ├── reports/        # Reporting functionality
+│   ├── system/         # System management
+│   ├── tracking/       # Progress tracking
+│   └── users/          # User management
+├── db/                 # Database configuration
+│   ├── schema.js       # Database schema
+│   └── indexDb.js      # Database connection
+├── middleware/         # Express middleware
+├── routes/             # API routes
+├── utils/              # Utility functions
+├── tests/              # Test files
+└── helper/             # Helper functions
+```
+
+## Future Enhancements
+
+1. **File Management**: Upload and manage educational resources
+2. **Attendance System**: Detailed student attendance tracking
+3. **Grading System**: Comprehensive student evaluation
+4. **Parent Portal**: Parent access to student information
+5. **Mobile Application**: Mobile app for teachers and students
+6. **Advanced Reporting**: Detailed analytics and insights
+7. **Integration APIs**: Third-party system integrations
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Submit a pull request
+
+## License
+
+This project is licensed under the ISC License.
