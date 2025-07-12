@@ -42,7 +42,7 @@ interface ChapterDetailsModalProps {
   onClose: () => void;
   onUpdateChapter: (chapter: Chapter) => void;
   onUpdateLesson: (lesson: Lesson) => void;
-  onAddLesson: (lesson: Omit<Lesson, "id">) => void;
+  onAddLesson: (lesson: Lesson) => void;
   onDeleteLesson: (lessonId: string) => void;
   canEdit: boolean;
 }
@@ -196,7 +196,7 @@ export function ChapterDetailsModal({
       isCompleted: !lesson.isCompleted,
       completedDate: !lesson.isCompleted ? new Date().toISOString() : undefined,
     };
-
+    console.log()
     try {
       const response = await fetch(`${baseUrl}/lesson/lessons/${lesson.id}`, {
         method: "PUT",
@@ -355,16 +355,8 @@ export function ChapterDetailsModal({
         variant: "success",
       });
 
-      onAddLesson({
-        title: newLesson.title,
-        chapterId: chapter.id,
-        isCompleted: false,
-        duration: newLesson.duration
-          ? Number.parseInt(newLesson.duration)
-          : undefined,
-        notes: newLesson.notes || undefined,
-      });
-
+      onAddLesson(lessonData);
+      
       setNewLesson({ title: "", duration: "", notes: "" });
       setShowAddLesson(false);
 
@@ -382,6 +374,58 @@ export function ChapterDetailsModal({
       });
     }
   };
+
+  const handleDeleteLesson = async (lessonId: string) => {
+    if (!hasPermission("delete_lessons")) {
+      alert("You do not have permission to delete lessons.");
+      toast({
+        title: "Permission Denied",
+        description: "You do not have permission to delete lessons.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch(`${baseUrl}/lesson/lessons/${lessonId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${accesstoken}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast({
+          title: "Error",
+          description: errorData.message || "Failed to delete lesson.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      onDeleteLesson(lessonId);
+      toast({
+        title: "Lesson Deleted",
+        description: "The lesson has been deleted successfully.",
+        variant: "success",
+      });
+
+      // Update chapter total lessons
+      const updatedChapter: Chapter = {
+        ...chapter,
+        totalLessons: chapter.totalLessons - 1,
+      };
+      onUpdateChapter(updatedChapter);
+    } catch (error) {
+      console.error("Failed to delete lesson:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete lesson. Please try again later.",
+        variant: "destructive",
+      });
+    }
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -687,7 +731,7 @@ export function ChapterDetailsModal({
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => onDeleteLesson(lesson.id)}
+                            onClick={() => handleDeleteLesson(lesson.id)}
                             className="h-8 w-8 text-destructive hover:text-destructive"
                           >
                             <Trash2 className="h-4 w-4" />

@@ -1175,17 +1175,14 @@ export default function TeacherManagement() {
 
   // Add lesson management functions
   const handleUpdateLesson = (updatedLesson: Lesson) => {
+    console.log("Updating lesson in page:", updatedLesson);
     setLessons((prev) =>
-      prev.map((l) => (l.id === updatedLesson.id ? updatedLesson : l))
+      prev.map((l) => (l.id === updatedLesson.id ? updatedLesson : l)) //
     );
   };
 
-  const handleAddLesson = (lessonData: Omit<Lesson, "id">) => {
-    const newLesson: Lesson = {
-      ...lessonData,
-      id: Date.now().toString(),
-    };
-    setLessons((prev) => [...prev, newLesson]);
+  const handleAddLesson = (lesson: Lesson) => {
+    setLessons((prev) => [...prev, lesson]);
   };
 
   const handleDeleteLesson = (lessonId: string) => {

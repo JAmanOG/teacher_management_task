@@ -37,7 +37,7 @@ interface AuthContextType {
 
   const ROLE_PERMISSIONS: ROLE_PERMISSIONSTYPE = {
     Teacher: ["view_teachers", "view_lessons", "edit_lessons"],
-    "Head Teacher": ["view_teachers","add_schedules","edit_schedules","delete_schedules","view_schedules",
+    "Head Teacher": ["view_teachers","add_schedules","edit_schedules","delete_lessons","delete_schedules","view_schedules",
       "add_teachers", "edit_teachers", "view_lessons", "edit_lessons", "view_reports"],
     Admin: [
       "view_teachers",
@@ -62,6 +62,7 @@ interface AuthContextType {
       "add_schedules",
       "edit_schedules",
       "delete_schedules",
+      "delete_lessons",
       "view_schedules",
       ],
     Principal: [
@@ -82,6 +83,7 @@ interface AuthContextType {
       "export_data",
       "manage_system",
       "view_classes",
+      "delete_lessons",
       "add_classes",
       "edit_classes",
       "delete_classes",

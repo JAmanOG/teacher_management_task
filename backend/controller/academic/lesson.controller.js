@@ -118,7 +118,9 @@ const updateLesson = asynchandler(async (req, res) => {
 const deleteLesson = asynchandler(async (req, res) => {
   const { id } = req.params;
 
-  const deletedLesson = await db.delete(lessons).where({ id }).returning("*");
+  const deletedLesson = await db.delete(lessons).where(
+    eq(lessons.id, id)
+  ).returning();
 
   if (!deletedLesson || deletedLesson.length === 0) {
     throw new ApiError(404, "Lesson not found");
