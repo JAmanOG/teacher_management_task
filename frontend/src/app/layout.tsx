@@ -5,6 +5,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 // import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/hooks/use-auth";
+import { Analytics } from "@vercel/analytics/react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,7 +42,9 @@ export default function RootLayout({
             <SidebarProvider>
               <div className="flex min-h-screen w-screen">
                 <SidebarTrigger />
-                <main className="flex-1">{children}</main>
+                <main className="flex-1">
+                  {children} <Analytics />
+                </main>
               </div>
             </SidebarProvider>
           </ThemeProvider>
