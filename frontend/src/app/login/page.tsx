@@ -167,7 +167,7 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="mt-6 p-4 bg-muted rounded-lg">
+          {/* <div className="mt-6 p-4 bg-muted rounded-lg">
             <p className="text-sm font-medium mb-2">Demo Accounts:</p>
             <div className="space-y-1 text-xs">
               {DEMO_USERS.map((user) => (
@@ -180,7 +180,7 @@ export default function LoginPage() {
                 Password for all: respective role + 123
               </p>
             </div>
-          </div>
+          </div> */}
 
               <div>
                 <p className="text-sm text-muted-foreground mt-4">
