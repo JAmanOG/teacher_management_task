@@ -23,17 +23,17 @@ export function StudentManagement({ students, currentUser }: StudentManagementPr
   const [subjectFilter, setSubjectFilter] = useState<string>("all")
 
   // Filter students based on teacher's subjects and classes
-  const teacherStudents = students.filter((student) => {
-    if (currentUser.role === "Teacher") {
-      return (
-        currentUser.assignedClasses?.includes(student.classId) &&
-        student.subjects.some((subject) => subject.name === currentUser.subject)
-      )
-    }
-    return true // Admin/Principal can see all students
-  })
+  // const teacherStudents = students.filter((student) => {
+  //   if (currentUser.role === "Teacher") {
+  //     return (
+  //       currentUser.assignedClasses?.includes(student.classId) &&
+  //       student.subjects.some((subject) => subject.name === currentUser.subject)
+  //     )
+  //   }
+  //   return true // Admin/Principal can see all students
+  // })
 
-  const filteredStudents = teacherStudents.filter((student) => {
+  const filteredStudents = students.filter((student) => {
     const matchesSearch =
       student.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -70,8 +70,8 @@ export function StudentManagement({ students, currentUser }: StudentManagementPr
     }
   }
 
-  const classes = [...new Set(teacherStudents.map((s) => s.classId))]
-  const subjects = [...new Set(teacherStudents.flatMap((s) => s.subjects.map((sub) => sub.name)))]
+  const classes = [...new Set(students.map((s) => s.classId))]
+  const subjects = [...new Set(students.flatMap((s) => s.subjects.map((sub) => sub.name)))]
 
   return (
     <div className="space-y-6">
